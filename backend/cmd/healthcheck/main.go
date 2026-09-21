@@ -1,10 +1,12 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 
 	"github.com/SalyC/mentorhub/backend/internal/config"
+	"github.com/SalyC/mentorhub/backend/internal/db"
 )
 
 func main() {
@@ -12,6 +14,16 @@ func main() {
 	if err != nil {
 		log.Fatalf("cfg load failed :( : %v", err)
 	}
+
+	ctx := context.Background()
+
+	pool, err := db.New(ctx, cfg.DB)
+	if err != nil {
+		log.Fatalf("DB connect failed: %v", err)
+	}
+	defer pool.Close()
+
+	fmt.Println("Postgres: connected")
 
 	fmt.Println("=== App ===")
 	fmt.Printf("Env:      %s\n", cfg.App.Env)
