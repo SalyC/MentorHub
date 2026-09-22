@@ -5,6 +5,11 @@ import (
 	"log"
 
 	"github.com/SalyC/mentorhub/backend/internal/config"
+<<<<<<< Updated upstream
+=======
+	"github.com/SalyC/mentorhub/backend/internal/db"
+	"github.com/SalyC/mentorhub/backend/internal/redisclient"
+>>>>>>> Stashed changes
 )
 
 func main() {
@@ -13,6 +18,24 @@ func main() {
 		log.Fatalf("cfg load failed :( : %v", err)
 	}
 
+<<<<<<< Updated upstream
+=======
+	ctx := context.Background()
+	pool, err := db.New(ctx, cfg.DB)
+	if err != nil {
+		log.Fatalf("DB connect failed: %v", err)
+	}
+	defer pool.Close()
+	fmt.Println("Postgres: connected")
+
+	redisClient, err := redisclient.New(ctx, cfg.Redis)
+	if err != nil {
+		log.Fatalf("Redis connect failed: %v", err)
+	}
+	defer redisClient.Close()
+	fmt.Println("Redis: connected")
+
+>>>>>>> Stashed changes
 	fmt.Println("=== App ===")
 	fmt.Printf("Env:      %s\n", cfg.App.Env)
 	fmt.Printf("Port:     %d\n", cfg.App.Port)
