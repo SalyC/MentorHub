@@ -177,7 +177,20 @@ go run ./cmd/healthcheck
 
 `healthcheck` подключается ко всем сервисам и печатает статус конфигурации.
 
-### 4. Запуск фронтенда
+### 4. Применение миграций
+
+```bash
+cd backend
+migrate -path migrations -database "postgres://mentorhub:mentorhub@127.0.0.1:5433/mentorhub?sslmode=disable" up
+```
+
+Если `migrate` не установлен:
+
+```bash
+go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+```
+
+### 5. Запуск фронтенда
 
 В новом терминале, из корня проекта:
 
@@ -227,6 +240,7 @@ npm run dev
 - [x] Frontend: каркас, авторизация, курсы, задания, чат, админка (на моках)
 - [x] Backend: инфраструктура (Docker Compose), конфигурация, healthcheck
 - [x] Backend: пакеты `db`, `redisclient`, `kafkaclient`
+- [x] Backend: миграции БД (таблица `users`)
 - [ ] Backend: Auth Service
 - [ ] Backend: Course Service
 - [ ] Backend: Grade Service
