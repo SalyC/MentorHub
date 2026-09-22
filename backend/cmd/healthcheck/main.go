@@ -7,6 +7,7 @@ import (
 
 	"github.com/SalyC/mentorhub/backend/internal/config"
 	"github.com/SalyC/mentorhub/backend/internal/db"
+	"github.com/SalyC/mentorhub/backend/internal/redisclient"
 )
 
 func main() {
@@ -22,8 +23,14 @@ func main() {
 		log.Fatalf("DB connect failed: %v", err)
 	}
 	defer pool.Close()
-
 	fmt.Println("Postgres: connected")
+
+	redisClient, err := redisclient.New(ctx, cfg.Redis)
+	if err != nil {
+		log.Fatalf("Redis connect failed: %v", err)
+	}
+	defer redisClient.Close()
+	fmt.Println("Redis: connected")
 
 	fmt.Println("=== App ===")
 	fmt.Printf("Env:      %s\n", cfg.App.Env)
@@ -36,12 +43,15 @@ func main() {
 	fmt.Printf("User:     %s\n", cfg.DB.User)
 	fmt.Printf("Name:     %s\n", cfg.DB.Name)
 	fmt.Printf("SSLMode:  %s\n", cfg.DB.SSLMode)
+
 	fmt.Println("=== Redis ===")
 	fmt.Printf("Host: %s\n", cfg.Redis.Host)
 	fmt.Printf("Port: %d\n", cfg.Redis.Port)
 	fmt.Printf("DB: %d\n", cfg.Redis.DB)
+
 	fmt.Println("=== Kafka ===")
 	fmt.Printf("Brokers %v\n", cfg.Kafka.Brokers)
+
 	fmt.Println("=== JWT ===")
 	fmt.Printf("AccessTTL %v\n", cfg.JWT.AccessTTL)
 	fmt.Printf("RefreshTTL %v\n", cfg.JWT.RefreshTTL)
