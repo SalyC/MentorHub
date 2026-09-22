@@ -226,7 +226,7 @@ npm run dev
 
 - [x] Frontend: каркас, авторизация, курсы, задания, чат, админка (на моках)
 - [x] Backend: инфраструктура (Docker Compose), конфигурация, healthcheck
-- [ ] Backend: пакеты `db`, `redisclient`, `kafkaclient`
+- [x] Backend: пакеты `db`, `redisclient`, `kafkaclient`
 - [ ] Backend: Auth Service
 - [ ] Backend: Course Service
 - [ ] Backend: Grade Service
