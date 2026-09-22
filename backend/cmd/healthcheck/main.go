@@ -7,7 +7,9 @@ import (
 
 	"github.com/SalyC/mentorhub/backend/internal/config"
 	"github.com/SalyC/mentorhub/backend/internal/db"
+	"github.com/SalyC/mentorhub/backend/internal/kafkaclient"
 	"github.com/SalyC/mentorhub/backend/internal/redisclient"
+	"github.com/segmentio/kafka-go"
 )
 
 func main() {
@@ -31,6 +33,20 @@ func main() {
 	}
 	defer redisClient.Close()
 	fmt.Println("Redis: connected")
+
+	producer := kafkaclient.NewProducer(cfg.Kafka)
+	defer producer.Close()
+
+	err = producer.WriteMessages(ctx, kafka.Message{
+		Topic: "healthcheck",
+		Value: []byte("ping"),
+	})
+	if err != nil {
+		log.Fatalf("Kafka connect failed: %v", err)
+	}
+	fmt.Println("Kafka: connected")
+
+	// ====================== ВСЕ ПРИНТЫ, ЧТОБЫ НЕ ПУТАТЬСЯ ========================================================================
 
 	fmt.Println("=== App ===")
 	fmt.Printf("Env:      %s\n", cfg.App.Env)
