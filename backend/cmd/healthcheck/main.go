@@ -20,11 +20,11 @@ func main() {
 
 	ctx := context.Background()
 
-	pool, err := db.New(ctx, cfg.DB)
+	dbConn, err := db.New(ctx, cfg.DB)
 	if err != nil {
 		log.Fatalf("DB connect failed: %v", err)
 	}
-	defer pool.Close()
+	defer dbConn.Close()
 	fmt.Println("Postgres: connected")
 
 	redisClient, err := redisclient.New(ctx, cfg.Redis)
