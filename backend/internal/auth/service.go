@@ -130,3 +130,63 @@ func (s *Service) Login(ctx context.Context, email, password string) (string, st
 	}
 	return accessToken, refreshToken, nil
 }
+
+func (s *Service) Refresh(ctx context.Context, refreshToken string) (string, string, error) {
+	claims, err := s.tokenManager.ValidateToken(refreshToken)
+	if err != nil {
+		return "", "", ErrInvalidToken
+	}
+	if claims.ID == "" {
+		return "", "", ErrInvalidToken
+	}
+
+	exists, err := s.tokenStore.Exists(ctx, claims.UserID, claims.ID)
+	if err != nil {
+		return "", "", fmt.Errorf("check refresh token: %w", err)
+	}
+	if !exists {
+		return "", "", ErrInvalidToken
+	}
+
+	if err = s.tokenStore.Delete(ctx, claims.UserID, claims.ID); err != nil {
+		return "", "", fmt.Errorf("delete old refresh token: %w", err)
+	}
+
+	user, err := s.userRepo.GetByID(ctx, claims.UserID)
+	if errors.Is(err, sql.ErrNoRows) {
+		return "", "", ErrInvalidToken
+	}
+	if err != nil {
+		return "", "", fmt.Errorf("get user: %w", err)
+	}
+	if user.IsBlocked {
+		return "", "", ErrUserBlocked
+	}
+	accessToken, refreshToken, err := s.tokenManager.GenerateTokenPair(user.ID, user.Role)
+	if err != nil {
+		return "", "", fmt.Errorf("generate tokens: %w", err)
+	}
+	newClaims, err := s.tokenManager.ValidateToken(refreshToken)
+	if err != nil {
+		return "", "", fmt.Errorf("validate new refresh: %w", err)
+	}
+
+	if err := s.tokenStore.Save(ctx, user.ID, newClaims.ID, s.refreshTTL); err != nil {
+		return "", "", fmt.Errorf("save refresh token: %w", err)
+	}
+
+	return accessToken, refreshToken, nil
+}
+
+func (s *Service) Logout(ctx context.Context, refreshToken string) error {
+	claims, err := s.tokenManager.ValidateToken(refreshToken)
+	if err != nil {
+		return nil
+	}
+
+	if err := s.tokenStore.Delete(ctx, claims.UserID, claims.ID); err != nil {
+		return fmt.Errorf("delete refresh token: %w", err)
+	}
+
+	return nil
+}
