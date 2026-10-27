@@ -241,7 +241,7 @@ npm run dev
 - [x] Backend: инфраструктура (Docker Compose), конфигурация, healthcheck
 - [x] Backend: пакеты `db`, `redisclient`, `kafkaclient`
 - [x] Backend: миграции БД (таблица `users`)
-- [ ] Backend: Auth Service
+- [X] Backend: Auth Service
 - [ ] Backend: Course Service
 - [ ] Backend: Grade Service
 - [ ] Backend: Chat Service
