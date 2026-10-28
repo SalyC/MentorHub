@@ -16,9 +16,10 @@ type Config struct {
 }
 
 type AppConfig struct {
-	Env      string
-	Port     int
-	LogLevel string
+	Env         string
+	Port        int
+	GatewayPort int
+	LogLevel    string
 }
 
 type DBConfig struct {
@@ -65,10 +66,15 @@ func Load() (*Config, error) {
 	if err != nil {
 		return nil, fmt.Errorf("app config: %w", err)
 	}
+	gatewayPort, err := getEnvInt("GATEWAY_PORT")
+	if err != nil {
+		return nil, fmt.Errorf("app config: %w", err)
+	}
 	app := AppConfig{
-		Env:      getEnvDefault("APP_ENV", "development"),
-		Port:     appPort,
-		LogLevel: getEnvDefault("LOG_LEVEL", "info"),
+		Env:         getEnvDefault("APP_ENV", "development"),
+		Port:        appPort,
+		GatewayPort: gatewayPort,
+		LogLevel:    getEnvDefault("LOG_LEVEL", "info"),
 	}
 
 	dbHost, err := getEnv("DB_HOST")
