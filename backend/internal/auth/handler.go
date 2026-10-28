@@ -25,8 +25,9 @@ type LogoutRequest struct {
 	RefreshToken string `json:"refresh_token"`
 }
 type AuthResponse struct {
-	AccessToken  string `json:"access_token"`
-	RefreshToken string `json:"refresh_token"`
+	User         UserResponse `json:"user"`
+	AccessToken  string       `json:"access_token"`
+	RefreshToken string       `json:"refresh_token"`
 }
 type UserResponse struct {
 	ID    string `json:"id"`
@@ -78,16 +79,26 @@ func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := h.service.Register(r.Context(), req.Email, req.Password)
+	_, err := h.service.Register(r.Context(), req.Email, req.Password)
 	if err != nil {
 		writeServiceError(w, err)
 		return
 	}
 
-	resp := UserResponse{
-		ID:    user.ID.String(),
-		Email: user.Email,
-		Role:  string(user.Role),
+	user, accessToken, refreshToken, err := h.service.Login(r.Context(), req.Email, req.Password)
+	if err != nil {
+		writeServiceError(w, err)
+		return
+	}
+
+	resp := AuthResponse{
+		User: UserResponse{
+			ID:    user.ID.String(),
+			Email: user.Email,
+			Role:  string(user.Role),
+		},
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
 	}
 
 	w.WriteHeader(http.StatusCreated)
@@ -107,13 +118,18 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	accessToken, refreshToken, err := h.service.Login(r.Context(), req.Email, req.Password)
+	user, accessToken, refreshToken, err := h.service.Login(r.Context(), req.Email, req.Password)
 	if err != nil {
 		writeServiceError(w, err)
 		return
 	}
 
 	resp := AuthResponse{
+		User: UserResponse{
+			ID:    user.ID.String(),
+			Email: user.Email,
+			Role:  string(user.Role),
+		},
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
 	}

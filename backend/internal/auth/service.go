@@ -97,38 +97,38 @@ func (s *Service) Register(ctx context.Context, email, password string) (*User, 
 	return user, nil
 }
 
-func (s *Service) Login(ctx context.Context, email, password string) (string, string, error) {
+func (s *Service) Login(ctx context.Context, email, password string) (*User, string, string, error) {
 	user, err := s.userRepo.GetByEmail(ctx, email)
 	if errors.Is(err, sql.ErrNoRows) {
-		return "", "", ErrInvalidCredentials
+		return nil, "", "", ErrInvalidCredentials
 	}
 	if err != nil {
-		return "", "", fmt.Errorf("get user by email: %w", err)
+		return nil, "", "", fmt.Errorf("get user by email: %w", err)
 	}
 
 	err = CheckPassword(password, user.PasswordHash)
 	if err != nil {
-		return "", "", ErrInvalidCredentials
+		return nil, "", "", ErrInvalidCredentials
 	}
 	if user.IsBlocked {
-		return "", "", ErrUserBlocked
+		return nil, "", "", ErrUserBlocked
 	}
 
 	accessToken, refreshToken, err := s.tokenManager.GenerateTokenPair(user.ID, user.Role)
 	if err != nil {
-		return "", "", fmt.Errorf("generate token: %w", err)
+		return nil, "", "", fmt.Errorf("generate token: %w", err)
 	}
 
 	claims, err := s.tokenManager.ValidateToken(refreshToken)
 	if err != nil {
-		return "", "", fmt.Errorf("validate refresh: %w", err)
+		return nil, "", "", fmt.Errorf("validate refresh: %w", err)
 	}
 
 	err = s.tokenStore.Save(ctx, user.ID, claims.ID, s.refreshTTL)
 	if err != nil {
-		return "", "", fmt.Errorf("save refresh token: %w", err)
+		return nil, "", "", fmt.Errorf("save refresh token: %w", err)
 	}
-	return accessToken, refreshToken, nil
+	return user, accessToken, refreshToken, nil
 }
 
 func (s *Service) Refresh(ctx context.Context, refreshToken string) (string, string, error) {
