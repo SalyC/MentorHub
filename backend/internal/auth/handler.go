@@ -10,6 +10,10 @@ type Handler struct {
 	service *Service
 }
 
+func NewHandler(service *Service) *Handler {
+	return &Handler{service: service}
+}
+
 type RegisterRequest struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
@@ -36,10 +40,6 @@ type UserResponse struct {
 }
 type ErrorResponse struct {
 	Error string `json:"error"`
-}
-
-func NewHandler(service *Service) *Handler {
-	return &Handler{service: service}
 }
 
 func writeServiceError(w http.ResponseWriter, err error) {
