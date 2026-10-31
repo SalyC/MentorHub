@@ -38,7 +38,7 @@ func (s *Service) CreateCourse(ctx context.Context, mentorID uuid.UUID, title, d
 func (s *Service) GetCourses(ctx context.Context) ([]Course, error) {
 	courses, err := s.repo.GetCourses(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("get course: %w", err)
+		return nil, fmt.Errorf("get courses: %w", err)
 	}
 	return courses, nil
 }

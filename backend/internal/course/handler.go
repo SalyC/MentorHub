@@ -63,3 +63,41 @@ func (h *Handler) CreateCourse(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(course)
 }
+
+func (h *Handler) GetCourses(w http.ResponseWriter, r *http.Request) {
+	courses, err := h.service.GetCourses(r.Context())
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(courses)
+}
+
+func (h *Handler) AddModule(w http.ResponseWriter, r *http.Request) {
+	var req AddModuleRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(ErrorResponse{Error: "invalid body request"})
+		return
+	}
+
+	courseIDStr := r.PathValue("courseID")
+	courseUUID, err := uuid.Parse(courseIDStr)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(ErrorResponse{Error: "invalid course ID format"})
+		return
+	}
+
+	course, err := h.service.AddModule(r.Context(), courseUUID, req.Title, req.Content, req.OrderIndex)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(ErrorResponse{Error: "failed to create module"})
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(course)
+}
