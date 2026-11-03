@@ -34,7 +34,7 @@ func (r *CourseRepository) CreateCourse(ctx context.Context, course *Course) err
 	return nil
 }
 func (r *CourseRepository) GetCourses(ctx context.Context) ([]Course, error) {
-	var courses []Course
+	courses := []Course{}
 	if err := r.db.SelectContext(ctx, &courses, querySelectCourses); err != nil {
 		return nil, fmt.Errorf("select courses: %w", err)
 	}

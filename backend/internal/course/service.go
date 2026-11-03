@@ -43,6 +43,14 @@ func (s *Service) GetCourses(ctx context.Context) ([]Course, error) {
 	return courses, nil
 }
 
+func (s *Service) GetCourseByID(ctx context.Context, id uuid.UUID) (*Course, error) {
+	course, err := s.repo.GetCourseByID(ctx, id)
+	if err != nil {
+		return nil, fmt.Errorf("get course by id: %w", err)
+	}
+	return course, nil
+}
+
 func (s *Service) AddModule(ctx context.Context, courseID uuid.UUID, title, content string, orderIndex int) (*Module, error) {
 	now := time.Now()
 	module := &Module{

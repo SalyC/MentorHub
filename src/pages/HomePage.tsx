@@ -1,31 +1,20 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
-import { enrollMockCourse, fetchMockCourses, type MockCourse } from "@/lib/mocks";
+import { apiClient } from "@/lib/apiClient";
+import type { Course } from "@/types";
 
 const coursesQueryKey = ["courses"] as const;
 
 export function HomePage() {
-  const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
-  const coursesQuery = useQuery({ queryKey: coursesQueryKey, queryFn: fetchMockCourses });
-  const enrollMutation = useMutation({
-    mutationFn: enrollMockCourse,
-    onMutate: async (courseId) => {
-      await queryClient.cancelQueries({ queryKey: coursesQueryKey });
-      const previousCourses = queryClient.getQueryData<MockCourse[]>(coursesQueryKey);
-      queryClient.setQueryData<MockCourse[]>(coursesQueryKey, (courses) =>
-        courses?.map((course) => course.id === courseId ? { ...course, isEnrolled: true } : course),
-      );
-      return { previousCourses };
-    },
-    onError: (_error, _courseId, context) => {
-      queryClient.setQueryData(coursesQueryKey, context?.previousCourses);
-    },
-    onSettled: () => queryClient.invalidateQueries({ queryKey: coursesQueryKey }),
+  
+  const coursesQuery = useQuery({
+    queryKey: coursesQueryKey,
+    queryFn: () => apiClient.get<Course[]>("/courses"),
   });
 
   const filteredCourses = coursesQuery.data?.filter((course) =>
@@ -59,12 +48,7 @@ export function HomePage() {
       {coursesQuery.isSuccess && filteredCourses && filteredCourses.length > 0 && (
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {filteredCourses.map((course) => (
-            <CourseCard
-              key={course.id}
-              course={course}
-              isEnrolling={enrollMutation.isPending && enrollMutation.variables === course.id}
-              onEnroll={() => enrollMutation.mutate(course.id)}
-            />
+            <CourseCard key={course.id} course={course} />
           ))}
         </div>
       )}
@@ -72,33 +56,23 @@ export function HomePage() {
   );
 }
 
-function CourseCard({ course, isEnrolling, onEnroll }: {
-  course: MockCourse;
-  isEnrolling: boolean;
-  onEnroll: () => void;
-}) {
+function CourseCard({ course }: { course: Course }) {
   return (
     <Card className="group flex h-full flex-col overflow-hidden transition-shadow hover:shadow-md">
       <Link to={`/courses/${course.id}`} className="flex flex-1 flex-col focus-visible:outline-none">
-        <img src={course.coverUrl} alt="" className="aspect-[16/9] w-full object-cover" />
+        <img src={course.cover_url || "https://placehold.co/600x400?text=No+Cover"} alt="" className="aspect-[16/9] w-full object-cover" />
         <CardContent className="flex flex-1 flex-col gap-3 p-5">
           <div>
             <h2 className="font-display text-xl text-ink group-hover:text-pine">{course.title}</h2>
-            <p className="mt-1 text-sm text-ink-faint">Ментор: {course.mentorName}</p>
+            <p className="mt-1 text-sm text-ink-faint">Ментор ID: {course.mentor_id}</p>
           </div>
           <p className="text-sm leading-6 text-ink-soft">{course.description}</p>
-          <p className="mt-auto text-xs text-ink-faint">{course.studentsCount} студентов</p>
+          <p className="mt-auto text-xs text-ink-faint">0 студентов</p>
         </CardContent>
       </Link>
       <div className="px-5 pb-5">
-        <Button
-          type="button"
-          size="sm"
-          variant={course.isEnrolled ? "outline" : "primary"}
-          disabled={course.isEnrolled || isEnrolling}
-          onClick={onEnroll}
-        >
-          {isEnrolling ? "Записываем..." : course.isEnrolled ? "Вы записаны" : "Записаться"}
+        <Button type="button" size="sm" variant="primary" disabled>
+          Скоро
         </Button>
       </div>
     </Card>
