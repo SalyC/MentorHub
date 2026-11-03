@@ -9,6 +9,16 @@ export interface User {
   telegramLinked: boolean;
 }
 
+export interface Course {
+  id: string;
+  mentor_id: string;
+  title: string;
+  description: string;
+  cover_url: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface AuthTokens {
   accessToken: string;
 }

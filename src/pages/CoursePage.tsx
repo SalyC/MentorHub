@@ -1,42 +1,19 @@
 import { useParams } from "react-router-dom";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
-import { enrollMockCourse, fetchMockCourse, MOCK_MODULES, type MockCourse } from "@/lib/mocks";
+import { MOCK_MODULES } from "@/lib/mocks";
+import { apiClient } from "@/lib/apiClient";
+import type { Course } from "@/types";
 
-const coursesQueryKey = ["courses"] as const;
 
 export function CoursePage() {
   const { id = "" } = useParams<{ id: string }>();
-  const queryClient = useQueryClient();
   const courseQueryKey = ["course", id] as const;
-  const courseQuery = useQuery({ queryKey: courseQueryKey, queryFn: () => fetchMockCourse(id) });
-  const enrollMutation = useMutation({
-    mutationFn: enrollMockCourse,
-    onMutate: async (courseId) => {
-      await Promise.all([
-        queryClient.cancelQueries({ queryKey: courseQueryKey }),
-        queryClient.cancelQueries({ queryKey: coursesQueryKey }),
-      ]);
-      const previousCourse = queryClient.getQueryData<MockCourse>(courseQueryKey);
-      const previousCourses = queryClient.getQueryData<MockCourse[]>(coursesQueryKey);
-      const markEnrolled = (course?: MockCourse) =>
-        course?.id === courseId ? { ...course, isEnrolled: true } : course;
-      queryClient.setQueryData<MockCourse>(courseQueryKey, markEnrolled(previousCourse));
-      queryClient.setQueryData<MockCourse[]>(coursesQueryKey, (courses) =>
-        courses?.map((course) => markEnrolled(course) as MockCourse),
-      );
-      return { previousCourse, previousCourses };
-    },
-    onError: (_error, _courseId, context) => {
-      queryClient.setQueryData(courseQueryKey, context?.previousCourse);
-      queryClient.setQueryData(coursesQueryKey, context?.previousCourses);
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: courseQueryKey });
-      queryClient.invalidateQueries({ queryKey: coursesQueryKey });
-    },
+  const courseQuery = useQuery({ 
+    queryKey: courseQueryKey, 
+    queryFn: () => apiClient.get<Course>(`/courses/${id}`) 
   });
 
   if (courseQuery.isLoading) return <CourseSkeleton />;
@@ -52,16 +29,16 @@ export function CoursePage() {
   return (
     <div className="flex flex-col gap-8">
       <section className="grid gap-6 md:grid-cols-[minmax(0,1.15fr)_minmax(280px,0.85fr)] md:items-center">
-        <img src={course.coverUrl} alt="" className="aspect-[16/9] w-full rounded-md object-cover" />
+        <img src={course.cover_url} alt="" className="aspect-[16/9] w-full rounded-md object-cover" />
         <div className="flex flex-col items-start gap-4">
           <div>
-            <p className="text-sm text-ink-faint">Ментор: {course.mentorName}</p>
+            <p className="text-sm text-ink-faint">Ментор: {course.mentor_id}</p>
             <h1 className="mt-2 font-display text-3xl text-ink">{course.title}</h1>
           </div>
           <p className="leading-7 text-ink-soft">{course.description}</p>
-          <p className="text-sm text-ink-faint">{course.studentsCount} студентов уже учатся на курсе</p>
-          <Button onClick={() => enrollMutation.mutate(course.id)} disabled={course.isEnrolled || enrollMutation.isPending}>
-            {enrollMutation.isPending ? "Записываем..." : course.isEnrolled ? "Вы записаны" : "Записаться"}
+          <p className="text-sm text-ink-faint">{0} студентов уже учатся на курсе</p>
+          <Button disabled>
+            Скоро
           </Button>
         </div>
       </section>

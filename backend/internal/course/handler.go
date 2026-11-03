@@ -101,3 +101,22 @@ func (h *Handler) AddModule(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(course)
 }
+
+func (h *Handler) GetCourseByID(w http.ResponseWriter, r *http.Request) {
+	courseIDStr := r.PathValue("courseID")
+	courseUUID, err := uuid.Parse(courseIDStr)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(ErrorResponse{Error: "invalid course ID format"})
+		return
+	}
+	course, err := h.service.GetCourseByID(r.Context(), courseUUID)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(ErrorResponse{Error: "failed to get course"})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(course)
+}
