@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/SalyC/mentorhub/backend/internal/auth"
 	"github.com/SalyC/mentorhub/backend/internal/config"
 	"github.com/SalyC/mentorhub/backend/internal/course"
 	"github.com/SalyC/mentorhub/backend/internal/db"
@@ -25,15 +26,21 @@ func main() {
 		log.Fatalf("db load failed: %v", err)
 	}
 
+	tm := auth.NewTokenManager(cfg.JWT.Secret, cfg.JWT.AccessTTL, cfg.JWT.RefreshTTL)
+
 	repo := course.NewCourseRepository(dbConn)
 	svc := course.NewService(repo)
 	handler := course.NewHandler(svc)
 	mux := http.NewServeMux()
-	mux.HandleFunc("POST /courses", handler.CreateCourse)
+
+	//TODO:! ЗАЩИЩЕННЫЕ МАРШРУТЫ (онли авторизованные)
+	mux.Handle("POST /courses", course.AuthMiddleware(tm)(http.HandlerFunc(handler.CreateCourse)))
+	mux.Handle("POST /courses/{courseID}/modules", course.AuthMiddleware(tm)(http.HandlerFunc(handler.AddModule)))
+
+	//TODO:! ПУБЛИЧНЫЕ МАРШРУТЫ (абсолютли все имеют доступ)
 	mux.HandleFunc("GET /courses", handler.GetCourses)
 	mux.HandleFunc("GET /courses/{courseID}", handler.GetCourseByID)
 	mux.HandleFunc("GET /courses/{courseID}/modules", handler.GetModules)
-	mux.HandleFunc("POST /courses/{courseID}/modules", handler.AddModule)
 
 	log.Printf("Starting Course Service on %s", addr)
 	if err := http.ListenAndServe(addr, mux); err != nil {
