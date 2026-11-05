@@ -32,7 +32,14 @@ export function CoursePage() {
   return (
     <div className="flex flex-col gap-8">
       <section className="grid gap-6 md:grid-cols-[minmax(0,1.15fr)_minmax(280px,0.85fr)] md:items-center">
-        <img src={course.cover_url} alt="" className="aspect-[16/9] w-full rounded-md object-cover" />
+        <img 
+          src={course.cover_url || "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1000&auto=format&fit=crop"} 
+          onError={(e) => {
+            e.currentTarget.src = "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1000&auto=format&fit=crop";
+          }}
+          alt={course.title} 
+          className="aspect-[16/9] w-full object-cover" 
+        />
         <div className="flex flex-col items-start gap-4">
           <div>
             <p className="text-sm text-ink-faint">Ментор: {course.mentor_id}</p>
