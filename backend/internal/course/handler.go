@@ -120,3 +120,22 @@ func (h *Handler) GetCourseByID(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(course)
 }
+
+func (h *Handler) GetModules(w http.ResponseWriter, r *http.Request) {
+	courseIDStr := r.PathValue("courseID")
+	courseUUID, err := uuid.Parse(courseIDStr)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(ErrorResponse{Error: "status bad request: invalid course ID format"})
+		return
+	}
+	modules, err := h.service.GetModulesByCourseID(r.Context(), courseUUID)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(ErrorResponse{Error: "failed to get modules"})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(modules)
+}

@@ -69,3 +69,11 @@ func (s *Service) AddModule(ctx context.Context, courseID uuid.UUID, title, cont
 
 	return module, nil
 }
+
+func (s *Service) GetModulesByCourseID(ctx context.Context, courseID uuid.UUID) ([]Module, error) {
+	mdl, err := s.repo.GetModulesByCourseID(ctx, courseID)
+	if err != nil {
+		return nil, fmt.Errorf("get modules: %w", err)
+	}
+	return mdl, nil
+}

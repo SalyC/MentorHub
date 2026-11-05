@@ -1,25 +1,25 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { Button } from "@/components/ui/Button";
-import { Card, CardContent } from "@/components/ui/Card";
-import { Input } from "@/components/ui/Input";
-import { apiClient } from "@/lib/apiClient";
-import type { Course } from "@/types";
+import { useState } from "react"
+import { Link } from "react-router-dom"
+import { useQuery } from "@tanstack/react-query"
+import { Button } from "@/components/ui/Button"
+import { Card, CardContent } from "@/components/ui/Card"
+import { Input } from "@/components/ui/Input"
+import { apiClient } from "@/lib/apiClient"
+import type { Course } from "@/types"
 
-const coursesQueryKey = ["courses"] as const;
+const coursesQueryKey = ["courses"] as const
 
 export function HomePage() {
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState("")
   
   const coursesQuery = useQuery({
     queryKey: coursesQueryKey,
     queryFn: () => apiClient.get<Course[]>("/courses"),
-  });
+  })
 
   const filteredCourses = coursesQuery.data?.filter((course) =>
     course.title.toLocaleLowerCase().includes(search.toLocaleLowerCase()),
-  );
+  )
 
   return (
     <div className="flex flex-col gap-8">
@@ -53,7 +53,7 @@ export function HomePage() {
         </div>
       )}
     </div>
-  );
+  )
 }
 
 function CourseCard({ course }: { course: Course }) {
@@ -76,7 +76,7 @@ function CourseCard({ course }: { course: Course }) {
         </Button>
       </div>
     </Card>
-  );
+  )
 }
 
 function CourseGridSkeleton() {
@@ -93,5 +93,5 @@ function CourseGridSkeleton() {
         </div>
       ))}
     </div>
-  );
+  )
 }

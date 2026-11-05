@@ -1,22 +1,22 @@
-import { NavLink } from "react-router-dom";
-import { Menu, X, Bell, GraduationCap } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
-import { Button } from "@/components/ui/Button";
-import { cn } from "@/lib/utils";
+import { NavLink } from "react-router-dom"
+import { Menu, X, Bell, GraduationCap } from "lucide-react"
+import { useAuth } from "@/hooks/useAuth"
+import { Button } from "@/components/ui/Button"
+import { cn } from "@/lib/utils"
 
 interface HeaderProps {
-  mobileNavOpen: boolean;
-  onToggleMobileNav: () => void;
+  mobileNavOpen: boolean
+  onToggleMobileNav: () => void
 }
 
 const linkClasses = ({ isActive }: { isActive: boolean }) =>
   cn(
     "text-sm font-medium transition-colors hover:text-pine",
     isActive ? "text-pine" : "text-ink-soft",
-  );
+  )
 
 export function Header({ mobileNavOpen, onToggleMobileNav }: HeaderProps) {
-  const { isAuthenticated, user, hasRole, logout } = useAuth();
+  const { isAuthenticated, user, hasRole, logout } = useAuth()
 
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-paper/95 backdrop-blur">
@@ -87,5 +87,5 @@ export function Header({ mobileNavOpen, onToggleMobileNav }: HeaderProps) {
         </div>
       </div>
     </header>
-  );
+  )
 }

@@ -1,28 +1,28 @@
-import { useState } from "react";
-import { Navigate } from "react-router-dom";
-import { BookOpen, ShieldCheck, Users } from "lucide-react";
-import { Button } from "@/components/ui/Button";
-import { Card, CardContent } from "@/components/ui/Card";
-import { cn } from "@/lib/utils";
-import { MOCK_COURSES } from "@/lib/mocks";
-import { useAuthStore } from "@/store/authStore";
-import type { UserRole } from "@/types";
+import { useState } from "react"
+import { Navigate } from "react-router-dom"
+import { BookOpen, ShieldCheck, Users } from "lucide-react"
+import { Button } from "@/components/ui/Button"
+import { Card, CardContent } from "@/components/ui/Card"
+import { cn } from "@/lib/utils"
+import { MOCK_COURSES } from "@/lib/mocks"
+import { useAuthStore } from "@/store/authStore"
+import type { UserRole } from "@/types"
 
-type AdminTab = "users" | "courses";
-type UserStatus = "active" | "blocked";
+type AdminTab = "users" | "courses"
+type UserStatus = "active" | "blocked"
 
 interface AdminUser {
-  id: string;
-  email: string;
-  role: UserRole;
-  status: UserStatus;
+  id: string
+  email: string
+  role: UserRole
+  status: UserStatus
 }
 
 interface AdminCourse {
-  id: string;
-  title: string;
-  mentor: string;
-  studentsCount: number;
+  id: string
+  title: string
+  mentor: string
+  studentsCount: number
 }
 
 const INITIAL_USERS: AdminUser[] = [
@@ -30,40 +30,40 @@ const INITIAL_USERS: AdminUser[] = [
   { id: "user-2", email: "mikhail@example.com", role: "student", status: "active" },
   { id: "user-3", email: "olga@example.com", role: "student", status: "blocked" },
   { id: "user-4", email: "admin@mentorhub.ru", role: "admin", status: "active" },
-];
+]
 
 const INITIAL_COURSES: AdminCourse[] = MOCK_COURSES.map((course) => ({
   id: course.id,
   title: course.title,
   mentor: course.mentorName,
   studentsCount: course.studentsCount,
-}));
+}))
 
 const TABS: { id: AdminTab; label: string; icon: typeof Users }[] = [
   { id: "users", label: "Пользователи", icon: Users },
   { id: "courses", label: "Курсы", icon: BookOpen },
-];
+]
 
 const ROLE_LABELS: Record<UserRole, string> = {
   student: "Студент",
   mentor: "Ментор",
   admin: "Администратор",
-};
+}
 
 export function AdminPage() {
-  const user = useAuthStore((state) => state.user);
-  const [activeTab, setActiveTab] = useState<AdminTab>("users");
-  const [users, setUsers] = useState<AdminUser[]>(INITIAL_USERS);
-  const [courses, setCourses] = useState<AdminCourse[]>(INITIAL_COURSES);
+  const user = useAuthStore((state) => state.user)
+  const [activeTab, setActiveTab] = useState<AdminTab>("users")
+  const [users, setUsers] = useState<AdminUser[]>(INITIAL_USERS)
+  const [courses, setCourses] = useState<AdminCourse[]>(INITIAL_COURSES)
 
   if (user?.role !== "admin") {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/" replace />
   }
 
   function updateUserRole(userId: string, role: UserRole) {
     setUsers((currentUsers) =>
       currentUsers.map((item) => (item.id === userId ? { ...item, role } : item)),
-    );
+    )
   }
 
   function toggleUserStatus(userId: string) {
@@ -73,11 +73,11 @@ export function AdminPage() {
           ? { ...item, status: item.status === "active" ? "blocked" : "active" }
           : item,
       ),
-    );
+    )
   }
 
   function removeCourse(courseId: string) {
-    setCourses((currentCourses) => currentCourses.filter((course) => course.id !== courseId));
+    setCourses((currentCourses) => currentCourses.filter((course) => course.id !== courseId))
   }
 
   return (
@@ -92,8 +92,8 @@ export function AdminPage() {
 
       <div className="flex gap-1 overflow-x-auto border-b border-line" role="tablist" aria-label="Разделы админ-панели">
         {TABS.map((tab) => {
-          const Icon = tab.icon;
-          const isActive = tab.id === activeTab;
+          const Icon = tab.icon
+          const isActive = tab.id === activeTab
           return (
             <button
               key={tab.id}
@@ -109,7 +109,7 @@ export function AdminPage() {
               <Icon className="h-4 w-4" aria-hidden="true" />
               {tab.label}
             </button>
-          );
+          )
         })}
       </div>
 
@@ -119,7 +119,7 @@ export function AdminPage() {
         <CoursesPanel courses={courses} onRemove={removeCourse} />
       )}
     </div>
-  );
+  )
 }
 
 function UsersPanel({
@@ -127,9 +127,9 @@ function UsersPanel({
   onRoleChange,
   onToggleStatus,
 }: {
-  users: AdminUser[];
-  onRoleChange: (userId: string, role: UserRole) => void;
-  onToggleStatus: (userId: string) => void;
+  users: AdminUser[]
+  onRoleChange: (userId: string, role: UserRole) => void
+  onToggleStatus: (userId: string) => void
 }) {
   return (
     <Card>
@@ -169,7 +169,7 @@ function UsersPanel({
         </div>
       </CardContent>
     </Card>
-  );
+  )
 }
 
 function UserRow({
@@ -177,9 +177,9 @@ function UserRow({
   onRoleChange,
   onToggleStatus,
 }: {
-  user: AdminUser;
-  onRoleChange: (userId: string, role: UserRole) => void;
-  onToggleStatus: (userId: string) => void;
+  user: AdminUser
+  onRoleChange: (userId: string, role: UserRole) => void
+  onToggleStatus: (userId: string) => void
 }) {
   return (
     <tr>
@@ -188,7 +188,7 @@ function UserRow({
       <td className="px-5 py-4"><StatusLabel status={user.status} /></td>
       <td className="px-5 py-4 text-right"><StatusButton user={user} onToggleStatus={onToggleStatus} /></td>
     </tr>
-  );
+  )
 }
 
 function UserCard({
@@ -196,9 +196,9 @@ function UserCard({
   onRoleChange,
   onToggleStatus,
 }: {
-  user: AdminUser;
-  onRoleChange: (userId: string, role: UserRole) => void;
-  onToggleStatus: (userId: string) => void;
+  user: AdminUser
+  onRoleChange: (userId: string, role: UserRole) => void
+  onToggleStatus: (userId: string) => void
 }) {
   return (
     <div className="flex flex-col gap-4 p-5">
@@ -212,7 +212,7 @@ function UserCard({
       </div>
       <StatusButton user={user} onToggleStatus={onToggleStatus} />
     </div>
-  );
+  )
 }
 
 function RoleSelect({ user, onRoleChange }: { user: AdminUser; onRoleChange: (userId: string, role: UserRole) => void }) {
@@ -228,7 +228,7 @@ function RoleSelect({ user, onRoleChange }: { user: AdminUser; onRoleChange: (us
         <option key={value} value={value}>{label}</option>
       ))}
     </select>
-  );
+  )
 }
 
 function StatusLabel({ status }: { status: UserStatus }) {
@@ -239,7 +239,7 @@ function StatusLabel({ status }: { status: UserStatus }) {
     )}>
       {status === "active" ? "Активен" : "Заблокирован"}
     </span>
-  );
+  )
 }
 
 function StatusButton({ user, onToggleStatus }: { user: AdminUser; onToggleStatus: (userId: string) => void }) {
@@ -247,7 +247,7 @@ function StatusButton({ user, onToggleStatus }: { user: AdminUser; onToggleStatu
     <Button type="button" variant="outline" size="sm" onClick={() => onToggleStatus(user.id)}>
       {user.status === "active" ? "Заблокировать" : "Разблокировать"}
     </Button>
-  );
+  )
 }
 
 function CoursesPanel({ courses, onRemove }: { courses: AdminCourse[]; onRemove: (courseId: string) => void }) {
@@ -279,7 +279,7 @@ function CoursesPanel({ courses, onRemove }: { courses: AdminCourse[]; onRemove:
         </div>
       </CardContent>
     </Card>
-  );
+  )
 }
 
 function CourseRow({ course, onRemove }: { course: AdminCourse; onRemove: (courseId: string) => void }) {
@@ -290,7 +290,7 @@ function CourseRow({ course, onRemove }: { course: AdminCourse; onRemove: (cours
       <td className="px-5 py-4 text-ink-soft">{course.studentsCount}</td>
       <td className="px-5 py-4 text-right"><RemoveButton course={course} onRemove={onRemove} /></td>
     </tr>
-  );
+  )
 }
 
 function CourseCard({ course, onRemove }: { course: AdminCourse; onRemove: (courseId: string) => void }) {
@@ -302,7 +302,7 @@ function CourseCard({ course, onRemove }: { course: AdminCourse; onRemove: (cour
       </div>
       <RemoveButton course={course} onRemove={onRemove} />
     </div>
-  );
+  )
 }
 
 function RemoveButton({ course, onRemove }: { course: AdminCourse; onRemove: (courseId: string) => void }) {
@@ -310,5 +310,5 @@ function RemoveButton({ course, onRemove }: { course: AdminCourse; onRemove: (co
     <Button type="button" variant="destructive" size="sm" onClick={() => onRemove(course.id)}>
       Удалить
     </Button>
-  );
+  )
 }

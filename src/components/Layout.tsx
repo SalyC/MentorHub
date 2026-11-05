@@ -1,16 +1,16 @@
-import { useAuthStore } from "@/store/authStore";
-import type { UserRole } from "@/types";
+import { useAuthStore } from "@/store/authStore"
+import type { UserRole } from "@/types"
 
 const DEV_ROLES: Array<Extract<UserRole, "student" | "mentor" | "admin">> = [
   "student",
   "mentor",
   "admin",
-];
+]
 
 export function DevDebugPanel() {
-  const devLogin = useAuthStore((state) => state.devLogin);
+  const devLogin = useAuthStore((state) => state.devLogin)
 
-  if (!import.meta.env.DEV) return null;
+  if (!import.meta.env.DEV) return null
 
   return (
     <div className="fixed bottom-4 right-4 z-50 rounded bg-yellow-100 p-3 shadow">
@@ -28,5 +28,5 @@ export function DevDebugPanel() {
         ))}
       </div>
     </div>
-  );
+  )
 }

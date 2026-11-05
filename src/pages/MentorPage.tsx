@@ -1,5 +1,5 @@
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
-import { ClipboardList, BookOpen } from "lucide-react";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card"
+import { ClipboardList, BookOpen } from "lucide-react"
 
 export function MentorPage() {
   return (
@@ -29,5 +29,5 @@ export function MentorPage() {
         </Card>
       </section>
     </div>
-  );
+  )
 }

@@ -1,29 +1,29 @@
 export interface MockCourse {
-  id: string;
-  title: string;
-  description: string;
-  coverUrl: string;
-  mentorName: string;
-  studentsCount: number;
-  isEnrolled: boolean;
+  id: string
+  title: string
+  description: string
+  coverUrl: string
+  mentorName: string
+  studentsCount: number
+  isEnrolled: boolean
 }
 
 export interface MockModule {
-  id: string;
-  title: string;
-  description: string;
+  id: string
+  title: string
+  description: string
 }
 
 export interface MockAssignment {
-  id: string;
-  title: string;
-  description: string;
-  deadline: string;
-  maxScore: number;
+  id: string
+  title: string
+  description: string
+  deadline: string
+  maxScore: number
   submission?: {
-    score: number;
-    comment: string;
-  };
+    score: number
+    comment: string
+  }
 }
 
 export const MOCK_COURSES: MockCourse[] = [
@@ -81,14 +81,14 @@ export const MOCK_COURSES: MockCourse[] = [
     studentsCount: 87,
     isEnrolled: false,
   },
-];
+]
 
 export const MOCK_MODULES: MockModule[] = [
   { id: "module-1", title: "Старт и настройка проекта", description: "Инструменты, структура проекта и рабочий процесс." },
   { id: "module-2", title: "Ключевые концепции", description: "Разберем основные идеи курса на понятных примерах." },
   { id: "module-3", title: "Практика в проекте", description: "Закрепим материал в задаче, близкой к реальной работе." },
   { id: "module-4", title: "Итоговый проект", description: "Соберем результат и подготовим его к презентации." },
-];
+]
 
 export const MOCK_ASSIGNMENTS: MockAssignment[] = [
   {
@@ -116,32 +116,32 @@ export const MOCK_ASSIGNMENTS: MockAssignment[] = [
     deadline: "2026-09-20T18:00:00+03:00",
     maxScore: 20,
   },
-];
+]
 
-const MOCK_DELAY = 300;
+const MOCK_DELAY = 300
 
 function wait(): Promise<void> {
-  return new Promise((resolve) => window.setTimeout(resolve, MOCK_DELAY));
+  return new Promise((resolve) => window.setTimeout(resolve, MOCK_DELAY))
 }
 
 export async function fetchMockCourses(): Promise<MockCourse[]> {
-  await wait();
-  return MOCK_COURSES;
+  await wait()
+  return MOCK_COURSES
 }
 
 export async function fetchMockCourse(id: string): Promise<MockCourse> {
-  await wait();
-  const course = MOCK_COURSES.find((item) => item.id === id);
-  if (!course) throw new Error("Курс не найден");
-  return course;
+  await wait()
+  const course = MOCK_COURSES.find((item) => item.id === id)
+  if (!course) throw new Error("Курс не найден")
+  return course
 }
 
 export async function enrollMockCourse(id: string): Promise<MockCourse> {
-  await wait();
-  const course = MOCK_COURSES.find((item) => item.id === id);
-  if (!course) throw new Error("Курс не найден");
-  course.isEnrolled = true;
-  return { ...course };
+  await wait()
+  const course = MOCK_COURSES.find((item) => item.id === id)
+  if (!course) throw new Error("Курс не найден")
+  course.isEnrolled = true
+  return { ...course }
 }
 
 export async function submitMockAssignment(
@@ -149,8 +149,8 @@ export async function submitMockAssignment(
   _text: string,
   _fileName: string | null,
 ): Promise<MockAssignment> {
-  await wait();
-  const assignment = MOCK_ASSIGNMENTS.find((item) => item.id === id);
-  if (!assignment) throw new Error("Задание не найдено");
-  return assignment;
+  await wait()
+  const assignment = MOCK_ASSIGNMENTS.find((item) => item.id === id)
+  if (!assignment) throw new Error("Задание не найдено")
+  return assignment
 }

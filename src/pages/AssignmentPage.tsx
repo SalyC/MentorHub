@@ -1,55 +1,55 @@
-import { useState, type FormEvent } from "react";
-import { useMutation } from "@tanstack/react-query";
-import { useParams } from "react-router-dom";
-import { AlertCircle, CheckCircle2, Clock3, UploadCloud } from "lucide-react";
-import { Button } from "@/components/ui/Button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
-import { MOCK_ASSIGNMENTS, submitMockAssignment, type MockAssignment } from "@/lib/mocks";
+import { useState, type FormEvent } from "react"
+import { useMutation } from "@tanstack/react-query"
+import { useParams } from "react-router-dom"
+import { AlertCircle, CheckCircle2, Clock3, UploadCloud } from "lucide-react"
+import { Button } from "@/components/ui/Button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card"
+import { MOCK_ASSIGNMENTS, submitMockAssignment, type MockAssignment } from "@/lib/mocks"
 
 function getDeadlineState(deadline: string): "past" | "soon" | "normal" {
-  const hoursLeft = (new Date(deadline).getTime() - Date.now()) / (1000 * 60 * 60);
-  if (hoursLeft <= 0) return "past";
-  if (hoursLeft < 24) return "soon";
-  return "normal";
+  const hoursLeft = (new Date(deadline).getTime() - Date.now()) / (1000 * 60 * 60)
+  if (hoursLeft <= 0) return "past"
+  if (hoursLeft < 24) return "soon"
+  return "normal"
 }
 
 function formatDeadline(deadline: string): string {
   return new Intl.DateTimeFormat("ru-RU", {
     dateStyle: "long",
     timeStyle: "short",
-  }).format(new Date(deadline));
+  }).format(new Date(deadline))
 }
 
 export function AssignmentPage() {
-  const { id = "" } = useParams<{ id: string }>();
-  const assignment = MOCK_ASSIGNMENTS.find((item) => item.id === id);
-  const [text, setText] = useState("");
-  const [fileName, setFileName] = useState<string | null>(null);
-  const [validationError, setValidationError] = useState<string | null>(null);
+  const { id = "" } = useParams<{ id: string }>()
+  const assignment = MOCK_ASSIGNMENTS.find((item) => item.id === id)
+  const [text, setText] = useState("")
+  const [fileName, setFileName] = useState<string | null>(null)
+  const [validationError, setValidationError] = useState<string | null>(null)
 
   const submitMutation = useMutation({
     mutationFn: () => submitMockAssignment(id, text, fileName),
-  });
+  })
 
   if (!assignment) {
     return (
       <p className="rounded border border-danger-50 bg-danger-50 p-4 text-sm text-danger" role="alert">
         Задание не найдено.
       </p>
-    );
+    )
   }
 
-  const deadlineState = getDeadlineState(assignment.deadline);
-  const hasAnswer = text.trim().length > 0 || fileName !== null;
+  const deadlineState = getDeadlineState(assignment.deadline)
+  const hasAnswer = text.trim().length > 0 || fileName !== null
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+    event.preventDefault()
     if (!hasAnswer) {
-      setValidationError("Добавьте текст решения или выберите файл.");
-      return;
+      setValidationError("Добавьте текст решения или выберите файл.")
+      return
     }
-    setValidationError(null);
-    submitMutation.mutate();
+    setValidationError(null)
+    submitMutation.mutate()
   }
 
   return (
@@ -82,8 +82,8 @@ export function AssignmentPage() {
                   className="w-full resize-y rounded border border-line bg-card px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine"
                   value={text}
                   onChange={(event) => {
-                    setText(event.target.value);
-                    setValidationError(null);
+                    setText(event.target.value)
+                    setValidationError(null)
                   }}
                 />
               </div>
@@ -104,8 +104,8 @@ export function AssignmentPage() {
                   type="file"
                   className="sr-only"
                   onChange={(event) => {
-                    setFileName(event.target.files?.[0]?.name ?? null);
-                    setValidationError(null);
+                    setFileName(event.target.files?.[0]?.name ?? null)
+                    setValidationError(null)
                   }}
                 />
               </div>
@@ -132,7 +132,7 @@ export function AssignmentPage() {
         </Card>
       )}
     </div>
-  );
+  )
 }
 
 function DeadlineNotice({ assignment, state }: { assignment: MockAssignment; state: "past" | "soon" | "normal" }) {
@@ -140,12 +140,12 @@ function DeadlineNotice({ assignment, state }: { assignment: MockAssignment; sta
     past: "border-danger-50 bg-danger-50 text-danger",
     soon: "border-ochre-100 bg-ochre-50 text-ochre-600",
     normal: "border-line bg-card text-ink-soft",
-  };
+  }
   const labels = {
     past: "Дедлайн прошёл",
     soon: "Дедлайн скоро",
     normal: "Дедлайн",
-  };
+  }
 
   return (
     <div className={`flex items-start gap-3 rounded border p-4 text-sm ${styles[state]}`}>
@@ -155,12 +155,12 @@ function DeadlineNotice({ assignment, state }: { assignment: MockAssignment; sta
         <p className="mt-1">{formatDeadline(assignment.deadline)} · максимум {assignment.maxScore} баллов</p>
       </div>
     </div>
-  );
+  )
 }
 
 function SubmittedBlock({ assignment }: { assignment: MockAssignment }) {
-  const submission = assignment.submission;
-  if (!submission) return null;
+  const submission = assignment.submission
+  if (!submission) return null
 
   return (
     <Card>
@@ -178,5 +178,5 @@ function SubmittedBlock({ assignment }: { assignment: MockAssignment }) {
         </div>
       </CardContent>
     </Card>
-  );
+  )
 }

@@ -1,15 +1,15 @@
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
-import type { User, UserRole } from "@/types";
+import { create } from "zustand"
+import { persist } from "zustand/middleware"
+import type { User, UserRole } from "@/types"
 
 interface AuthState {
-  user: User | null;
-  accessToken: string | null;
-  isAuthenticated: boolean;
-  setSession: (user: User, accessToken: string) => void;
-  devLogin: (role: Extract<UserRole, "student" | "mentor" | "admin">) => void;
-  updateUser: (user: User) => void;
-  logout: () => void;
+  user: User | null
+  accessToken: string | null
+  isAuthenticated: boolean
+  setSession: (user: User, accessToken: string) => void
+  devLogin: (role: Extract<UserRole, "student" | "mentor" | "admin">) => void
+  updateUser: (user: User) => void
+  logout: () => void
 }
 
 /**
@@ -50,4 +50,4 @@ export const useAuthStore = create<AuthState>()(
       name: "mentorhub-auth", // ключ в localStorage
     },
   ),
-);
+)
