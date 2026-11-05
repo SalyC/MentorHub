@@ -1,31 +1,34 @@
-import { useParams } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { BookOpen } from "lucide-react";
-import { Button } from "@/components/ui/Button";
-import { Card, CardContent } from "@/components/ui/Card";
-import { MOCK_MODULES } from "@/lib/mocks";
-import { apiClient } from "@/lib/apiClient";
-import type { Course } from "@/types";
+import { useParams } from "react-router-dom"
+import { useQuery } from "@tanstack/react-query"
+import { BookOpen } from "lucide-react"
+import { Button } from "@/components/ui/Button"
+import { Card, CardContent } from "@/components/ui/Card"
+import { apiClient } from "@/lib/apiClient"
+import type { Course, Module } from "@/types"
 
 
 export function CoursePage() {
-  const { id = "" } = useParams<{ id: string }>();
-  const courseQueryKey = ["course", id] as const;
+  const { id = "" } = useParams<{ id: string }>()
+  const courseQueryKey = ["course", id] as const
   const courseQuery = useQuery({ 
     queryKey: courseQueryKey, 
     queryFn: () => apiClient.get<Course>(`/courses/${id}`) 
-  });
-
-  if (courseQuery.isLoading) return <CourseSkeleton />;
+  })
+  const modulesQuery = useQuery({
+    queryKey: ["modules", id],
+    queryFn: () => apiClient.get<Module[]>(`/courses/${id}/modules`),
+  })
+  
+  if (courseQuery.isLoading) return <CourseSkeleton />
   if (courseQuery.isError || !courseQuery.data) {
     return (
       <p className="rounded border border-danger-50 bg-danger-50 p-4 text-sm text-danger" role="alert">
         Не удалось загрузить курс. Возможно, он больше недоступен.
       </p>
-    );
+    )
   }
 
-  const course = courseQuery.data;
+  const course = courseQuery.data
   return (
     <div className="flex flex-col gap-8">
       <section className="grid gap-6 md:grid-cols-[minmax(0,1.15fr)_minmax(280px,0.85fr)] md:items-center">
@@ -46,7 +49,7 @@ export function CoursePage() {
       <section className="flex flex-col gap-4">
         <h2 className="font-display text-2xl text-ink">Модули курса</h2>
         <div className="grid gap-3 sm:grid-cols-2">
-          {MOCK_MODULES.map((module, index) => (
+          {modulesQuery.data?.map((module, index) => (
             <Card key={module.id}>
               <CardContent className="flex gap-4 p-5">
                 <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-pine-50 text-sm font-medium text-pine">
@@ -54,7 +57,7 @@ export function CoursePage() {
                 </span>
                 <div>
                   <h3 className="font-display text-lg text-ink">{module.title}</h3>
-                  <p className="mt-1 text-sm leading-6 text-ink-soft">{module.description}</p>
+                  <p className="mt-1 text-sm leading-6 text-ink-soft">{module.content}</p>
                 </div>
               </CardContent>
             </Card>
@@ -62,7 +65,7 @@ export function CoursePage() {
         </div>
       </section>
     </div>
-  );
+  )
 }
 
 function CourseSkeleton() {
@@ -82,5 +85,5 @@ function CourseSkeleton() {
         <div className="h-7 w-40 rounded bg-muted" />
       </div>
     </div>
-  );
+  )
 }

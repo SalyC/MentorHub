@@ -1,33 +1,33 @@
-import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
-import { apiClient } from "@/lib/apiClient";
-import { useAuth } from "@/hooks/useAuth";
-import { useAuthStore } from "@/store/authStore";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
-import { Send } from "lucide-react";
+import { useState } from "react"
+import { useMutation } from "@tanstack/react-query"
+import { apiClient } from "@/lib/apiClient"
+import { useAuth } from "@/hooks/useAuth"
+import { useAuthStore } from "@/store/authStore"
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card"
+import { Button } from "@/components/ui/Button"
+import { Input } from "@/components/ui/Input"
+import { Send } from "lucide-react"
 
 export function ProfilePage() {
-  const { user } = useAuth();
-  const updateUser = useAuthStore((state) => state.updateUser);
-  const [name, setName] = useState(user?.name ?? "");
-  const [telegramCode, setTelegramCode] = useState<string | null>(null);
+  const { user } = useAuth()
+  const updateUser = useAuthStore((state) => state.updateUser)
+  const [name, setName] = useState(user?.name ?? "")
+  const [telegramCode, setTelegramCode] = useState<string | null>(null)
 
   const saveProfileMutation = useMutation({
     mutationFn: () => apiClient.put("/users/me", { name }),
     onSuccess: () => {
-      if (user) updateUser({ ...user, name });
+      if (user) updateUser({ ...user, name })
     },
-  });
+  })
 
   const requestTelegramCodeMutation = useMutation({
     mutationFn: () =>
       apiClient.post<{ code: string }>("/users/telegram/connect"),
     onSuccess: (data) => setTelegramCode(data.code),
-  });
+  })
 
-  if (!user) return null;
+  if (!user) return null
 
   return (
     <div className="flex max-w-2xl flex-col gap-6">
@@ -95,5 +95,5 @@ export function ProfilePage() {
         </CardContent>
       </Card>
     </div>
-  );
+  )
 }

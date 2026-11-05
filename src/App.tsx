@@ -1,16 +1,16 @@
-import { Routes, Route } from "react-router-dom";
-import { AppLayout } from "@/components/layout/AppLayout";
-import { ProtectedRoute } from "@/components/ProtectedRoute";
-import { HomePage } from "@/pages/HomePage";
-import { LoginPage } from "@/pages/LoginPage";
-import { RegisterPage } from "@/pages/RegisterPage";
-import { ProfilePage } from "@/pages/ProfilePage";
-import { CoursePage } from "@/pages/CoursePage";
-import { AssignmentPage } from "@/pages/AssignmentPage";
-import { AdminPage } from "@/pages/AdminPage";
-import { MentorPage } from "@/pages/MentorPage";
-import { ChatPage } from "@/pages/ChatPage";
-import { NotFoundPage } from "@/pages/NotFoundPage";
+import { Routes, Route } from "react-router-dom"
+import { AppLayout } from "@/components/layout/AppLayout"
+import { ProtectedRoute } from "@/components/ProtectedRoute"
+import { HomePage } from "@/pages/HomePage"
+import { LoginPage } from "@/pages/LoginPage"
+import { RegisterPage } from "@/pages/RegisterPage"
+import { ProfilePage } from "@/pages/ProfilePage"
+import { CoursePage } from "@/pages/CoursePage"
+import { AssignmentPage } from "@/pages/AssignmentPage"
+import { AdminPage } from "@/pages/AdminPage"
+import { MentorPage } from "@/pages/MentorPage"
+import { ChatPage } from "@/pages/ChatPage"
+import { NotFoundPage } from "@/pages/NotFoundPage"
 
 export function App() {
   return (
@@ -41,5 +41,5 @@ export function App() {
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>
-  );
+  )
 }

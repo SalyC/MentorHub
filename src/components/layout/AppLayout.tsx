@@ -1,11 +1,11 @@
-import { useState } from "react";
-import { Outlet } from "react-router-dom";
-import { Header } from "./Header";
-import { MobileNav } from "./MobileNav";
-import { DevDebugPanel } from "../Layout";
+import { useState } from "react"
+import { Outlet } from "react-router-dom"
+import { Header } from "./Header"
+import { MobileNav } from "./MobileNav"
+import { DevDebugPanel } from "../Layout"
 
 export function AppLayout() {
-  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false)
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -27,5 +27,5 @@ export function AppLayout() {
 
       <DevDebugPanel />
     </div>
-  );
+  )
 }

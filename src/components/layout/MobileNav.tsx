@@ -1,22 +1,22 @@
-import { NavLink } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
-import { cn } from "@/lib/utils";
+import { NavLink } from "react-router-dom"
+import { useAuth } from "@/hooks/useAuth"
+import { cn } from "@/lib/utils"
 
 interface MobileNavProps {
-  open: boolean;
-  onNavigate: () => void;
+  open: boolean
+  onNavigate: () => void
 }
 
 const linkClasses = ({ isActive }: { isActive: boolean }) =>
   cn(
     "block rounded px-3 py-2 text-base font-medium",
     isActive ? "bg-pine-50 text-pine" : "text-ink-soft hover:bg-muted",
-  );
+  )
 
 export function MobileNav({ open, onNavigate }: MobileNavProps) {
-  const { isAuthenticated, hasRole, logout } = useAuth();
+  const { isAuthenticated, hasRole, logout } = useAuth()
 
-  if (!open) return null;
+  if (!open) return null
 
   return (
     <nav
@@ -47,8 +47,8 @@ export function MobileNav({ open, onNavigate }: MobileNavProps) {
               type="button"
               className="mt-2 rounded px-3 py-2 text-left text-base font-medium text-danger hover:bg-danger-50"
               onClick={() => {
-                logout();
-                onNavigate();
+                logout()
+                onNavigate()
               }}
             >
               Выйти
@@ -66,5 +66,5 @@ export function MobileNav({ open, onNavigate }: MobileNavProps) {
         )}
       </div>
     </nav>
-  );
+  )
 }

@@ -1,17 +1,17 @@
-import { useEffect, useRef, useState, type FormEvent } from "react";
-import { useParams } from "react-router-dom";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
-import { cn } from "@/lib/utils";
-import { createWsClient, type ConnectionStatus, type WsChatMessage } from "@/lib/wsClient";
-import { useAuthStore } from "@/store/authStore";
+import { useEffect, useRef, useState, type FormEvent } from "react"
+import { useParams } from "react-router-dom"
+import { Button } from "@/components/ui/Button"
+import { Input } from "@/components/ui/Input"
+import { cn } from "@/lib/utils"
+import { createWsClient, type ConnectionStatus, type WsChatMessage } from "@/lib/wsClient"
+import { useAuthStore } from "@/store/authStore"
 
 const STATUS_LABELS: Record<ConnectionStatus, string> = {
   connecting: "Подключение...",
   open: "Подключено",
   reconnecting: "Переподключение...",
   closed: "Нет соединения",
-};
+}
 
 function getMockHistory(courseId: string): WsChatMessage[] {
   return [
@@ -36,60 +36,60 @@ function getMockHistory(courseId: string): WsChatMessage[] {
       text: "Подойдет любой редактор с поддержкой TypeScript. В VS Code удобно начать с готовых расширений.",
       createdAt: new Date(Date.now() - 1000 * 60 * 4).toISOString(),
     },
-  ];
+  ]
 }
 
 function formatMessageTime(createdAt: string): string {
   return new Intl.DateTimeFormat("ru-RU", {
     hour: "2-digit",
     minute: "2-digit",
-  }).format(new Date(createdAt));
+  }).format(new Date(createdAt))
 }
 
 export function ChatPage() {
-  const { courseId = "" } = useParams<{ courseId: string }>();
-  const accessToken = useAuthStore((state) => state.accessToken);
-  const currentUser = useAuthStore((state) => state.user);
-  const [messages, setMessages] = useState<WsChatMessage[]>(() => getMockHistory(courseId));
-  const [status, setStatus] = useState<ConnectionStatus>("connecting");
-  const [draft, setDraft] = useState("");
-  const clientRef = useRef<ReturnType<typeof createWsClient> | null>(null);
-  const bottomRef = useRef<HTMLDivElement>(null);
+  const { courseId = "" } = useParams<{ courseId: string }>()
+  const accessToken = useAuthStore((state) => state.accessToken)
+  const currentUser = useAuthStore((state) => state.user)
+  const [messages, setMessages] = useState<WsChatMessage[]>(() => getMockHistory(courseId))
+  const [status, setStatus] = useState<ConnectionStatus>("connecting")
+  const [draft, setDraft] = useState("")
+  const clientRef = useRef<ReturnType<typeof createWsClient> | null>(null)
+  const bottomRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" })
+  }, [messages])
 
   useEffect(() => {
-    if (!courseId || !accessToken) return;
+    if (!courseId || !accessToken) return
 
-    const url = `ws://localhost:8080/ws/chat/${encodeURIComponent(courseId)}?token=${encodeURIComponent(accessToken)}`;
-    const client = createWsClient(url);
-    clientRef.current = client;
+    const url = `ws://localhost:8080/ws/chat/${encodeURIComponent(courseId)}?token=${encodeURIComponent(accessToken)}`
+    const client = createWsClient(url)
+    clientRef.current = client
     const unsubscribeMessages = client.onMessage((message) => {
-      setMessages((current) => [...current, message]);
-    });
-    const unsubscribeStatus = client.onStatus(setStatus);
+      setMessages((current) => [...current, message])
+    })
+    const unsubscribeStatus = client.onStatus(setStatus)
 
     return () => {
-      unsubscribeMessages();
-      unsubscribeStatus();
-      client.close();
-      clientRef.current = null;
-    };
-  }, [courseId, accessToken]);
+      unsubscribeMessages()
+      unsubscribeStatus()
+      client.close()
+      clientRef.current = null
+    }
+  }, [courseId, accessToken])
 
   function handleSend(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const text = draft.trim();
-    if (!text || status !== "open" || !accessToken) return;
+    event.preventDefault()
+    const text = draft.trim()
+    if (!text || status !== "open" || !accessToken) return
 
-    clientRef.current?.send(text);
-    setDraft("");
+    clientRef.current?.send(text)
+    setDraft("")
   }
 
   if (!accessToken) {
-    return <p className="text-sm text-ink-soft">Войдите в аккаунт, чтобы присоединиться к чату курса.</p>;
+    return <p className="text-sm text-ink-soft">Войдите в аккаунт, чтобы присоединиться к чату курса.</p>
   }
 
   return (
@@ -119,7 +119,7 @@ export function ChatPage() {
         ) : (
           <ul className="flex flex-col gap-4">
             {messages.map((message) => {
-              const isOwn = message.senderId === currentUser?.id;
+              const isOwn = message.senderId === currentUser?.id
               return (
                 <li key={message.id} className={cn("flex flex-col", isOwn ? "items-end" : "items-start")}>
                   <div className={cn("flex max-w-[85%] flex-col", isOwn ? "items-end" : "items-start")}>
@@ -136,7 +136,7 @@ export function ChatPage() {
                     </span>
                   </div>
                 </li>
-              );
+              )
             })}
           </ul>
         )}
@@ -156,5 +156,5 @@ export function ChatPage() {
         </Button>
       </form>
     </div>
-  );
+  )
 }

@@ -1,24 +1,24 @@
-import { useAuthStore } from "@/store/authStore";
+import { useAuthStore } from "@/store/authStore"
 
-const BASE_URL = "http://localhost:8080/api";
+const BASE_URL = "http://localhost:8080/api"
 
 export class ApiError extends Error {
-  status: number;
-  body: unknown;
+  status: number
+  body: unknown
 
   constructor(status: number, message: string, body: unknown) {
-    super(message);
-    this.status = status;
-    this.body = body;
+    super(message)
+    this.status = status
+    this.body = body
   }
 }
 
 interface RequestOptions {
-  method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
-  body?: unknown;
-  headers?: Record<string, string>;
+  method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE"
+  body?: unknown
+  headers?: Record<string, string>
   /** Skip attaching the Authorization header (login/register/refresh calls). */
-  skipAuth?: boolean;
+  skipAuth?: boolean
 }
 
 /**
@@ -34,33 +34,33 @@ async function request<TResponse>(
   path: string,
   options: RequestOptions = {},
 ): Promise<TResponse> {
-  const { method = "GET", body, headers = {}, skipAuth = false } = options;
+  const { method = "GET", body, headers = {}, skipAuth = false } = options
 
-  const accessToken = useAuthStore.getState().accessToken;
+  const accessToken = useAuthStore.getState().accessToken
 
   const finalHeaders: Record<string, string> = {
     "Content-Type": "application/json",
     ...headers,
-  };
+  }
 
   if (!skipAuth && accessToken) {
-    finalHeaders.Authorization = `Bearer ${accessToken}`;
+    finalHeaders.Authorization = `Bearer ${accessToken}`
   }
 
   const response = await fetch(`${BASE_URL}${path}`, {
     method,
     headers: finalHeaders,
     body: body !== undefined ? JSON.stringify(body) : undefined,
-  });
+  })
 
   if (response.status === 401 && !skipAuth) {
-    handleUnauthorized();
+    handleUnauthorized()
   }
 
   if (!response.ok) {
-    let parsedBody: unknown = null;
+    let parsedBody: unknown = null
     try {
-      parsedBody = await response.json();
+      parsedBody = await response.json()
     } catch {
       // no JSON body — that's fine
     }
@@ -68,21 +68,21 @@ async function request<TResponse>(
       response.status,
       `Request failed: ${method} ${path} (${response.status})`,
       parsedBody,
-    );
+    )
   }
 
   if (response.status === 204) {
-    return undefined as TResponse;
+    return undefined as TResponse
   }
 
-  return (await response.json()) as TResponse;
+  return (await response.json()) as TResponse
 }
 
 function handleUnauthorized(): void {
   // TODO: attempt a silent refresh against /auth/refresh once the backend
   // contract is confirmed. For now, drop the session so the UI routes the
   // user back to /login via the auth guard.
-  useAuthStore.getState().logout();
+  useAuthStore.getState().logout()
 }
 
 export const apiClient = {
@@ -100,4 +100,4 @@ export const apiClient = {
 
   delete: <T>(path: string, options?: Omit<RequestOptions, "method" | "body">) =>
     request<T>(path, { ...options, method: "DELETE" }),
-};
+}

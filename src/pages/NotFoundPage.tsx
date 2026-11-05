@@ -1,5 +1,5 @@
-import { NavLink } from "react-router-dom";
-import { Button } from "@/components/ui/Button";
+import { NavLink } from "react-router-dom"
+import { Button } from "@/components/ui/Button"
 
 export function NotFoundPage() {
   return (
@@ -12,5 +12,5 @@ export function NotFoundPage() {
         <NavLink to="/">На главную</NavLink>
       </Button>
     </div>
-  );
+  )
 }

@@ -32,6 +32,7 @@ func main() {
 	mux.HandleFunc("POST /courses", handler.CreateCourse)
 	mux.HandleFunc("GET /courses", handler.GetCourses)
 	mux.HandleFunc("GET /courses/{courseID}", handler.GetCourseByID)
+	mux.HandleFunc("GET /courses/{courseID}/modules", handler.GetModules)
 	mux.HandleFunc("POST /courses/{courseID}/modules", handler.AddModule)
 
 	log.Printf("Starting Course Service on %s", addr)
