@@ -11,8 +11,8 @@ import type { User } from "@/types"
 
 interface RegisterResponse {
   user: User
-  accessToken: string
-  refreshToken?: string
+  access_token: string
+  refresh_token?: string
 }
 
 function getErrorMessage(error: unknown): string {
@@ -36,10 +36,10 @@ export function RegisterPage() {
     mutationFn: (payload: { email: string; password: string }) =>
       apiClient.post<RegisterResponse>("/auth/register", payload, { skipAuth: true }),
     onSuccess: (data) => {
-      setSession(data.user, data.accessToken)
-      if (data.refreshToken) {
+      setSession(data.user, data.access_token)
+      if (data.refresh_token) {
         // TODO: переедет в httpOnly cookie.
-        localStorage.setItem("refreshToken", data.refreshToken)
+        localStorage.setItem("refreshToken", data.refresh_token)
       }
       navigate("/")
     },
