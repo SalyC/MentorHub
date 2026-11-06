@@ -11,8 +11,8 @@ import type { User } from "@/types"
 
 interface LoginResponse {
   user: User
-  access_token: string
-  refresh_token?: string
+  accessToken: string
+  refreshToken?: string
 }
 
 function getErrorMessage(error: unknown): string {
@@ -36,10 +36,10 @@ export function LoginPage() {
     mutationFn: (payload: { email: string; password: string }) =>
       apiClient.post<LoginResponse>("/auth/login", payload, { skipAuth: true }),
     onSuccess: (data) => {
-      setSession(data.user, data.access_token)
-      if (data.refresh_token) {
+      setSession(data.user, data.accessToken)
+      if (data.refreshToken) {
         // TODO: переедет в httpOnly cookie.
-        localStorage.setItem("refreshToken", data.refresh_token)
+        localStorage.setItem("refreshToken", data.refreshToken)
       }
       navigate("/")
     },

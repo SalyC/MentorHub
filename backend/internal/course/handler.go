@@ -40,9 +40,16 @@ func (h *Handler) CreateCourse(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	mentorUUID, ok := r.Context().Value("userID").(uuid.UUID)
-	if !ok {
+	mentorIDStr := r.Header.Get("X-User-ID")
+	if mentorIDStr == "" {
 		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(ErrorResponse{Error: "X-User-ID header is required"})
+		return
+	}
+	mentorUUID, err := uuid.Parse(mentorIDStr)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(ErrorResponse{Error: "invalid X-User-ID format"})
 		return
 	}
 
