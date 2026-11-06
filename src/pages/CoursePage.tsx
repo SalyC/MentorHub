@@ -27,6 +27,7 @@ export function CoursePage() {
       </p>
     )
   }
+  
 
   const course = courseQuery.data
   return (
