@@ -21,7 +21,7 @@ function getErrorMessage(error: unknown): string {
     if (typeof message === "string" && message) return message
   }
 
-  return "Не удалось войти. Проверьте email и пароль."
+  return "Не удалось войти, проверьте email и пароль."
 }
 
 export function LoginPage() {

@@ -60,7 +60,14 @@ function CourseCard({ course }: { course: Course }) {
   return (
     <Card className="group flex h-full flex-col overflow-hidden transition-shadow hover:shadow-md">
       <Link to={`/courses/${course.id}`} className="flex flex-1 flex-col focus-visible:outline-none">
-        <img src={course.cover_url || "https://placehold.co/600x400?text=No+Cover"} alt="" className="aspect-[16/9] w-full object-cover" />
+        <img 
+          src={course.cover_url || "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1000&auto=format&fit=crop"} 
+          onError={(e) => {
+            e.currentTarget.src = "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1000&auto=format&fit=crop";
+          }}
+          alt={course.title} 
+          className="aspect-[16/9] w-full object-cover" 
+        />
         <CardContent className="flex flex-1 flex-col gap-3 p-5">
           <div>
             <h2 className="font-display text-xl text-ink group-hover:text-pine">{course.title}</h2>
