@@ -20,7 +20,6 @@ function getErrorMessage(error: unknown): string {
     const message = (error.body as { error?: unknown }).error
     if (typeof message === "string" && message) return message
   }
-
   return "Не удалось войти. Проверьте email и пароль."
 }
 
