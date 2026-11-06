@@ -105,6 +105,43 @@ export function MentorPage() {
       </section>
 
       <section className="flex flex-col gap-3">
+        <h2 className="font-display text-lg text-ink">Создать новый курс</h2>
+        <Card>
+          <CardContent className="p-6">
+            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+              <Input 
+                placeholder="Название курса" 
+                value={title} 
+                onChange={(e) => setTitle(e.target.value)} 
+                required 
+              />
+              <Input 
+                placeholder="Описание курса" 
+                value={description} 
+                onChange={(e) => setDescription(e.target.value)} 
+                required 
+              />
+              <Input 
+                placeholder="Ссылка на обложку (URL)" 
+                value={coverUrl} 
+                onChange={(e) => setCoverUrl(e.target.value)} 
+              />
+              <Button 
+                type="submit" 
+                disabled={createCourseMutation.isPending}
+              >
+                {createCourseMutation.isPending ? "Создание..." : "Создать курс"}
+              </Button>
+
+              {createCourseMutation.isError && (
+                <p className="text-sm text-danger">Ошибка при создании курса. Проверьте авторизацию.</p>
+              )}
+            </form>
+          </CardContent>
+        </Card>
+      </section>
+
+      <section className="flex flex-col gap-3">
         <h2 className="font-display text-lg text-ink">Решения на проверке</h2>
         <Card>
           <CardHeader>
