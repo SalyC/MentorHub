@@ -16,17 +16,17 @@ const (
 	queryUpdateUserBlocked = `UPDATE users SET is_blocked = $1, updated_at = NOW() WHERE id = $2`
 )
 
-type UserRepository struct {
+type PostgresUserRepository struct {
 	db *sqlx.DB
 }
 
-func NewUserRepository(db *sqlx.DB) *UserRepository {
-	return &UserRepository{
+func NewPostgresUserRepository(db *sqlx.DB) *PostgresUserRepository {
+	return &PostgresUserRepository{
 		db: db,
 	}
 }
 
-func (r *UserRepository) Create(ctx context.Context, user *User) error {
+func (r *PostgresUserRepository) Create(ctx context.Context, user *User) error {
 	_, err := r.db.NamedExecContext(ctx, queryInsertUser, user)
 	if err != nil {
 		return fmt.Errorf("insert user: %w", err)
@@ -34,7 +34,7 @@ func (r *UserRepository) Create(ctx context.Context, user *User) error {
 	return nil
 }
 
-func (r *UserRepository) GetByEmail(ctx context.Context, email string) (*User, error) {
+func (r *PostgresUserRepository) GetByEmail(ctx context.Context, email string) (*User, error) {
 	var user User
 	err := r.db.GetContext(ctx, &user, querySelectUserByEmail, email)
 	if err != nil {
@@ -43,7 +43,7 @@ func (r *UserRepository) GetByEmail(ctx context.Context, email string) (*User, e
 	return &user, nil
 }
 
-func (r *UserRepository) GetByID(ctx context.Context, id uuid.UUID) (*User, error) {
+func (r *PostgresUserRepository) GetByID(ctx context.Context, id uuid.UUID) (*User, error) {
 	var user User
 	err := r.db.GetContext(ctx, &user, querySelectUserByID, id)
 	if err != nil {
@@ -52,7 +52,7 @@ func (r *UserRepository) GetByID(ctx context.Context, id uuid.UUID) (*User, erro
 	return &user, nil
 }
 
-func (r *UserRepository) UpdateRole(ctx context.Context, id uuid.UUID, role Role) error {
+func (r *PostgresUserRepository) UpdateRole(ctx context.Context, id uuid.UUID, role Role) error {
 	_, err := r.db.ExecContext(ctx, queryUpdateUserRole, role, id)
 	if err != nil {
 		return fmt.Errorf("update user role: %w", err)
@@ -60,7 +60,7 @@ func (r *UserRepository) UpdateRole(ctx context.Context, id uuid.UUID, role Role
 	return nil
 }
 
-func (r *UserRepository) SetBlocked(ctx context.Context, id uuid.UUID, blocked bool) error {
+func (r *PostgresUserRepository) SetBlocked(ctx context.Context, id uuid.UUID, blocked bool) error {
 	_, err := r.db.ExecContext(ctx, queryUpdateUserBlocked, blocked, id)
 	if err != nil {
 		return fmt.Errorf("update user blocked: %w", err)

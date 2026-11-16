@@ -37,7 +37,7 @@ func main() {
 	producer := kafkaclient.NewProducer(cfg.Kafka)
 	defer producer.Close()
 
-	userRepo := auth.NewUserRepository(dbConn)
+	userRepo := auth.NewPostgresUserRepository(dbConn)
 	tokenManager := auth.NewTokenManager(cfg.JWT.Secret, cfg.JWT.AccessTTL, cfg.JWT.RefreshTTL)
 	tokenStore := auth.NewTokenStore(rdb)
 
