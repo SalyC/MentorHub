@@ -24,20 +24,39 @@ type UserRegisteredEvent struct {
 	Email  string `json:"email"`
 	Role   string `json:"role"`
 }
+type UserRepository interface {
+	Create(ctx context.Context, user *User) error
+	GetByEmail(ctx context.Context, email string) (*User, error)
+	GetByID(ctx context.Context, id uuid.UUID) (*User, error)
+}
+
+type EventProducer interface {
+	WriteMessages(ctx context.Context, msgs ...kafka.Message) error
+}
+
+type TokenManagerInterface interface {
+	GenerateTokenPair(userID uuid.UUID, role Role) (string, string, error)
+	ValidateToken(token string) (*Claims, error)
+}
+type TokenStoreInterface interface {
+	Save(ctx context.Context, userID uuid.UUID, tokenID string, ttl time.Duration) error
+	Delete(ctx context.Context, userID uuid.UUID, tokenID string) error
+	Exists(ctx context.Context, userID uuid.UUID, tokenID string) (bool, error)
+}
 
 type Service struct {
-	userRepo     *UserRepository
-	tokenManager *TokenManager
-	tokenStore   *TokenStore
-	producer     *kafka.Writer
+	userRepo     UserRepository
+	tokenManager TokenManagerInterface
+	tokenStore   TokenStoreInterface
+	producer     EventProducer
 	refreshTTL   time.Duration
 }
 
 func NewService(
-	userRepo *UserRepository,
-	tokenManager *TokenManager,
-	tokenStore *TokenStore,
-	producer *kafka.Writer,
+	userRepo UserRepository,
+	tokenManager TokenManagerInterface,
+	tokenStore TokenStoreInterface,
+	producer EventProducer,
 	refreshTTL time.Duration,
 ) *Service {
 	return &Service{
