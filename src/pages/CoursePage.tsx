@@ -1,14 +1,50 @@
 import { useParams } from "react-router-dom"
-import { useQuery } from "@tanstack/react-query"
-import { BookOpen } from "lucide-react"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { BookOpen, Plus } from "lucide-react"
 import { Button } from "@/components/ui/Button"
 import { Card, CardContent } from "@/components/ui/Card"
 import { apiClient } from "@/lib/apiClient"
 import type { Course, Module } from "@/types"
+import { useState } from "react"
+import { toast } from "sonner"
+import { useAuthStore } from "@/store/authStore"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/Dialog"
+import { Input } from "@/components/ui/Input"
+
 
 
 export function CoursePage() {
   const { id = "" } = useParams<{ id: string }>()
+  const user = useAuthStore((state) => state.user)
+  const queryClient = useQueryClient()
+  const [title, setTitle] = useState("")
+  const [content, setContent] = useState("")
+  const [orderIndex, setOrderIndex] = useState("")
+  const [isOpen, setIsOpen] = useState(false)
+  const addModuleMutation = useMutation({
+    mutationFn: (payload: { title: string; content: string; order_index: number }) =>
+      apiClient.post(`/courses/${id}/modules`, payload),
+    onSuccess: () => {
+      setTitle("")
+      setContent("")
+      setOrderIndex("")
+      setIsOpen(false)
+      queryClient.invalidateQueries({ queryKey: ["modules", id] })
+      toast.success("Модуль успешно добавлен!")
+    },
+    onError: () => {
+      toast.error("Ошибка при создании модуля. Проверьте права.")
+    }
+  })
+
+const handleAddModule = (e: React.FormEvent) => {
+  e.preventDefault()
+  addModuleMutation.mutate({ 
+    title, 
+    content, 
+    order_index: Number(orderIndex) // ! Бэкенд ждет int, а input отдает string
+  })
+}
   const courseQueryKey = ["course", id] as const
   const courseQuery = useQuery({ 
     queryKey: courseQueryKey, 
@@ -55,13 +91,56 @@ export function CoursePage() {
       </section>
 
       <section className="flex flex-col gap-4">
-        <h2 className="font-display text-2xl text-ink">Модули курса</h2>
+        <div className="flex items-center justify-between">
+          <h2 className="font-display text-2xl text-ink">Модули курса</h2>
+
+          {/* Показываем кнопку только ментору или админу */}
+          {(user?.role === "mentor" || user?.role === "admin") && (
+            <Dialog open={isOpen} onOpenChange={setIsOpen}>
+              <DialogTrigger asChild>
+                <Button className="gap-2">
+                  <Plus className="h-4 w-4" /> Добавить модуль
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>Новый модуль</DialogTitle>
+                </DialogHeader>
+                <form onSubmit={handleAddModule} className="flex flex-col gap-4 mt-4">
+                  <Input 
+                    placeholder="Название модуля" 
+                    value={title} 
+                    onChange={(e) => setTitle(e.target.value)} 
+                    required 
+                  />
+                  <Input 
+                    placeholder="Содержание (текст)" 
+                    value={content} 
+                    onChange={(e) => setContent(e.target.value)} 
+                    required 
+                  />
+                  <Input 
+                    type="number" // Чтобы вводились только цифры
+                    placeholder="Порядковый номер (1, 2, 3...)" 
+                    value={orderIndex} 
+                    onChange={(e) => setOrderIndex(e.target.value)} 
+                    required 
+                  />
+                  <Button type="submit" disabled={addModuleMutation.isPending}>
+                    {addModuleMutation.isPending ? "Создание..." : "Создать модуль"}
+                  </Button>
+                </form>
+              </DialogContent>
+            </Dialog>
+          )}
+        </div>
+        
         <div className="grid gap-3 sm:grid-cols-2">
           {modulesQuery.data?.map((module, index) => (
             <Card key={module.id}>
               <CardContent className="flex gap-4 p-5">
                 <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-pine-50 text-sm font-medium text-pine">
-                  {index + 1}
+                  {module.order_index || index + 1}
                 </span>
                 <div>
                   <h3 className="font-display text-lg text-ink">{module.title}</h3>
