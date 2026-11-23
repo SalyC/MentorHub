@@ -243,7 +243,7 @@ npm run dev
 - [x] Backend: миграции БД (таблица `users`)
 - [X] Backend: Auth Service
 - [x] Backend: Course Service
-- [ ] Backend: Grade Service
+- [x] Backend: Grade Service
 - [ ] Backend: Chat Service
 - [ ] Backend: Notification Service + Telegram-бот
 - [ ] Backend: API Gateway

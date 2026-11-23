@@ -22,16 +22,23 @@ func main() {
 		log.Fatalf("invalid auth service url: %v", err)
 	}
 	proxy := httputil.NewSingleHostReverseProxy(authURL)
+
+	gradeURL, _ := url.Parse(fmt.Sprintf("http://localhost:%d", cfg.App.GradePort))
+	gradeProxy := httputil.NewSingleHostReverseProxy(gradeURL)
+
 	courseURL, err := url.Parse(fmt.Sprintf("http://localhost:%d", cfg.App.CoursePort))
 	if err != nil {
 		log.Fatalf("invalid course service URL: %v", err)
 	}
 	courseProxy := httputil.NewSingleHostReverseProxy(courseURL)
+
 	mux := http.NewServeMux()
+
 	mux.HandleFunc("/api/auth/", func(w http.ResponseWriter, r *http.Request) {
 		r.URL.Path = strings.TrimPrefix(r.URL.Path, "/api")
 		proxy.ServeHTTP(w, r)
 	})
+
 	mux.HandleFunc("/api/courses", func(w http.ResponseWriter, r *http.Request) {
 		r.URL.Path = strings.TrimPrefix(r.URL.Path, "/api")
 		courseProxy.ServeHTTP(w, r)
@@ -39,6 +46,23 @@ func main() {
 	mux.HandleFunc("/api/courses/", func(w http.ResponseWriter, r *http.Request) {
 		r.URL.Path = strings.TrimPrefix(r.URL.Path, "/api")
 		courseProxy.ServeHTTP(w, r)
+	})
+
+	mux.HandleFunc("/api/assignments", func(w http.ResponseWriter, r *http.Request) {
+		r.URL.Path = strings.TrimPrefix(r.URL.Path, "/api")
+		gradeProxy.ServeHTTP(w, r)
+	})
+	mux.HandleFunc("/api/assignments/", func(w http.ResponseWriter, r *http.Request) {
+		r.URL.Path = strings.TrimPrefix(r.URL.Path, "/api")
+		gradeProxy.ServeHTTP(w, r)
+	})
+	mux.HandleFunc("/api/submissions", func(w http.ResponseWriter, r *http.Request) {
+		r.URL.Path = strings.TrimPrefix(r.URL.Path, "/api")
+		gradeProxy.ServeHTTP(w, r)
+	})
+	mux.HandleFunc("/api/submissions/", func(w http.ResponseWriter, r *http.Request) {
+		r.URL.Path = strings.TrimPrefix(r.URL.Path, "/api")
+		gradeProxy.ServeHTTP(w, r)
 	})
 
 	addr := fmt.Sprintf(":%d", cfg.App.GatewayPort)
