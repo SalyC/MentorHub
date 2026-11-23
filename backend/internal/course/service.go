@@ -35,8 +35,16 @@ func (s *Service) CreateCourse(ctx context.Context, mentorID uuid.UUID, title, d
 	return course, nil
 }
 
-func (s *Service) GetCourses(ctx context.Context) ([]Course, error) {
-	courses, err := s.repo.GetCourses(ctx)
+func (s *Service) GetCourses(ctx context.Context, mentorID *uuid.UUID) ([]Course, error) {
+	var courses []Course
+	var err error
+
+	if mentorID != nil {
+		courses, err = s.repo.GetCoursesByMentorID(ctx, *mentorID)
+	} else {
+		courses, err = s.repo.GetCourses(ctx)
+	}
+
 	if err != nil {
 		return nil, fmt.Errorf("get courses: %w", err)
 	}

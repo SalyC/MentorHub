@@ -242,7 +242,7 @@ npm run dev
 - [x] Backend: пакеты `db`, `redisclient`, `kafkaclient`
 - [x] Backend: миграции БД (таблица `users`)
 - [X] Backend: Auth Service
-- [ ] Backend: Course Service
+- [x] Backend: Course Service
 - [ ] Backend: Grade Service
 - [ ] Backend: Chat Service
 - [ ] Backend: Notification Service + Telegram-бот
