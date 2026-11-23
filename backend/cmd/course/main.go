@@ -25,6 +25,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("db load failed: %v", err)
 	}
+	defer dbConn.Close()
 
 	tm := auth.NewTokenManager(cfg.JWT.Secret, cfg.JWT.AccessTTL, cfg.JWT.RefreshTTL)
 
