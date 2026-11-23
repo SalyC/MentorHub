@@ -58,7 +58,18 @@ func (h *Handler) CreateCourse(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) GetCourses(w http.ResponseWriter, r *http.Request) {
-	courses, err := h.service.GetCourses(r.Context())
+	var mentorID *uuid.UUID
+	mentorIDStr := r.URL.Query().Get("mentor_id")
+	if mentorIDStr != "" {
+		parsedUUID, err := uuid.Parse(mentorIDStr)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(ErrorResponse{Error: "Failed to parse mentor ID"})
+			return
+		}
+		mentorID = &parsedUUID
+	}
+	courses, err := h.service.GetCourses(r.Context(), mentorID)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return

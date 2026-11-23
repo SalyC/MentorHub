@@ -16,6 +16,7 @@ const (
 	queryInsertModule     = `INSERT INTO modules (id, course_id, title, content, order_index, created_at, updated_at)
 	VALUES (:id, :course_id, :title, :content, :order_index, :created_at, :updated_at)`
 	querySelectModulesByCourseID = `SELECT * FROM modules WHERE course_id = $1 ORDER BY order_index ASC`
+	querySelectCourseByMentor    = `SELECT * FROM courses WHERE mentor_id = $1 ORDER BY created_at DESC`
 )
 
 type CourseRepository struct {
@@ -46,6 +47,13 @@ func (r *CourseRepository) GetCourseByID(ctx context.Context, id uuid.UUID) (*Co
 		return nil, fmt.Errorf("select course by id: %w", err)
 	}
 	return &courses, nil
+}
+func (r *CourseRepository) GetCoursesByMentorID(ctx context.Context, mentorID uuid.UUID) ([]Course, error) {
+	courses := []Course{}
+	if err := r.db.SelectContext(ctx, &courses, querySelectCourseByMentor, mentorID); err != nil {
+		return nil, fmt.Errorf("select course by mentor ID: %w", err)
+	}
+	return courses, nil
 }
 func (r *CourseRepository) CreateModule(ctx context.Context, module *Module) error {
 	_, err := r.db.NamedExecContext(ctx, queryInsertModule, module)
